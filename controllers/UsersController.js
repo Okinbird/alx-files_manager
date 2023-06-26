@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 import dbClient from '../utils/db';
+import authUtils from '../utils/auth';
 
 class UsersController {
   static async postNew(req, res) {
