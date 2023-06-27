@@ -1,27 +1,32 @@
-import AppController from '../controllers/AppController';
-import UsersController from '../controllers/UsersController';
-import AuthController from '../controllers/AuthController';
-import FilesController from '../controllers/FilesController';
-
 const express = require('express');
-// all endpoints of our API
-const router = (app) => {
-  const paths = express.Router();
-  app.use(express.json());
-  app.use('/', paths);
+const { getStatus, getStats } = require('../controllers/AppController');
+const { postNew, getMe } = require('../controllers/UsersController');
+const { getConnect, getDisconnect } = require('../controllers/AuthController');
+const {
+  postUpload, getShow, getIndex, putPublish, putUnpublish, getFile,
+} = require('../controllers/FilesController');
 
-  paths.get('/status', ((request, response) => AppController.getStatus(request, response)));
-  paths.get('/stats', ((request, response) => AppController.getStats(request, response)));
-  paths.post('/users', ((request, response) => UsersController.postNew(request, response)));
-  paths.get('/connect', ((request, response) => AuthController.getConnect(request, response)));
-  paths.get('/disconnect', ((request, response) => AuthController.getDisconnect(request, response)));
-  paths.get('/users/me', ((request, response) => UsersController.getMe(request, response)));
-  paths.post('/files', ((request, response) => FilesController.postUpload(request, response)));
-  paths.get('/files/:id', ((request, response) => FilesController.getShow(request, response)));
-  paths.get('/files', ((request, response) => FilesController.getIndex(request, response)));
-  paths.put('/files/:id/publish', ((request, response) => FilesController.putPublish(request, response)));
-  paths.put('/files/:id/unpublish', ((request, response) => FilesController.putUnpublish(request, response)));
-  paths.get('/files/:id/data', ((request, response) => FilesController.getFile(request, response)));
-};
+const router = express.Router();
 
-export default router;
+// app routes
+router.get('/', (req, res) => res.send('Hi, this is a file manager.'));
+router.get('/status', (req, res) => getStatus(req, res));
+router.get('/stats', (req, res) => getStats(req, res));
+
+// user routes
+router.post('/users', (req, res) => postNew(req, res));
+router.get('/users/me', (req, res) => getMe(req, res));
+
+// auth routes
+router.get('/connect', (req, res) => getConnect(req, res));
+router.get('/disconnect', (req, res) => getDisconnect(req, res));
+
+// files routes
+router.post('/files', (req, res) => postUpload(req, res));
+router.get('/files/:id', (req, res) => getShow(req, res));
+router.get('/files', (req, res) => getIndex(req, res));
+router.put('/files/:id/publish', (req, res) => putPublish(req, res));
+router.put('/files/:id/unpublish', (req, res) => putUnpublish(req, res));
+router.get('/files/:id/data', (req, res) => getFile(req, res));
+
+module.exports = router;
