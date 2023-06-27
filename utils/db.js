@@ -1,39 +1,51 @@
+import { env } from 'process';
+
 const { MongoClient } = require('mongodb');
 
-/** DBclient - A MongoDB client class */
-class DBclient {
-  constructor() {
-    const host = process.env.DB_HOST || 'localhost';
-    const port = process.env.DB_PORT || 27017;
-    const database = process.env.DB_DATABASE || 'files_manager';
-    const uri = `mongodb://${host}:${port}/`;
+const DB_HOST = env.DB_HOST || 'localhost';
+const DB_PORT = env.DB_PORT || 27017;
+const DB_DATABASE = env.DB_DATABASE || 'files_manager';
+const url = `mongodb://${DB_HOST}:${DB_PORT}`;
 
-    this.client = null;
-    // Creating a connection to mongodb, saving dabase client to this.client
-    MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (err, db) => {
-      if (err) this.client = false;
-      else {
-        this.client = db.db(database);
-        this.client.createCollection('users');
-        this.client.createCollection('files');
-      }
+class DBClient {
+  constructor() {
+    this.mongoClient = new MongoClient(
+      url,
+      {
+        useUnifiedTopology: true,
+        useNewUrlParser: true,
+      },
+    );
+
+    const promise = new Promise((resolve, reject) => {
+      this.mongoClient.connect((err) => { reject(err); });
+      resolve(this.mongoClient.db(DB_DATABASE));
     });
+    this.connection = promise;
   }
 
   isAlive() {
-    return !!this.client; // this.client ? true : false;
+    return this.mongoClient.isConnected();
   }
 
   async nbUsers() {
-    const numDocs = await this.client.collection('users').estimatedDocumentCount({});
-    return numDocs;
+    return this.connection
+      .then((database) => {
+        const collection = database.collection('users');
+        return collection.countDocuments();
+      })
+      .catch();
   }
 
   async nbFiles() {
-    const numDocs = await this.client.collection('files').estimatedDocumentCount({});
-    return numDocs;
+    return this.connection
+      .then((database) => {
+        const collection = database.collection('files');
+        return collection.countDocuments();
+      })
+      .catch();
   }
 }
 
-const dbClient = new DBclient();
-module.exports = dbClient;
+const dbClient = new DBClient();
+export default dbClient;
