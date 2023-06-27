@@ -5,8 +5,8 @@ import RedisClient from '../utils/redis';
 import DBClient from '../utils/db';
 
 const mongo = require('mongodb');
-//const process = require('process');
-//const fs = require('fs');
+const process = require('process');
+const fs = require('fs');
 
 class FilesController {
   static async postUpload(req, res) {
