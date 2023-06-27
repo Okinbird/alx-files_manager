@@ -16,7 +16,6 @@ app.use('/connect', router);
 app.use('/disconnect', router);
 app.use('/files', router);
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-    
+app.listen(port);
+
 module.exports = app;
