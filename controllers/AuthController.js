@@ -3,6 +3,7 @@ import DBClient from '../utils/db';
 import RedisClient from '../utils/redis';
 
 const sha1 = require('sha1');
+const mongo = require('mongodb');
 
 class AuthController {
   static async getConnect(req, res) {
